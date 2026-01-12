@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>2026 World Cup Tickets - Booking</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f5f7fa; color: #1a1a1a; line-height: 1.6; }
+        .container { max-width:1200px; margin:0 auto; padding:0 15px; }
+        header { background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%); color:white; padding:1.5rem 0; position:sticky; top:0; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+        .header-content { display:flex; justify-content:space-between; align-items:center; }
+        .logo h1 { font-size:1.8rem; margin:0; }
+        .logo span { color:#ffca28; }
+        
+        .header-right { display:flex; align-items:center; gap:20px; }
+        .language-selector { position:relative; }
+        .lang-btn { background:rgba(255,255,255,0.2); color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer; display:flex; align-items:center; gap:8px; font-weight:500; }
+        .lang-dropdown { display:none; position:absolute; top:100%; right:0; background:white; color:#333; border-radius:8px; box-shadow:0 5px 15px rgba(0,0,0,0.1); min-width:150px; z-index:1000; }
+        .lang-dropdown.show { display:block; }
+        .lang-option { padding:10px 15px; cursor:pointer; display:flex; align-items:center; gap:10px; }
+        .lang-option:hover { background:#f5f7fa; }
+        .lang-flag { width:20px; height:15px; object-fit:cover; border-radius:2px; }
+        
+        .admin-link { color:white; text-decoration:none; font-size:0.9rem; opacity:0.8; }
+        .admin-link:hover { opacity:1; }
+
+        .section-title { text-align:center; margin:2.5rem 0 1.5rem; font-size:2rem; color:#0d47a1; }
+
+        .matches-scroll-container { overflow-x:auto; padding-bottom:1rem; scrollbar-width:thin; }
+        .matches-scroll { display:flex; gap:1.2rem; width:max-content; }
+        .match-card { background:white; border-radius:12px; padding:1.2rem; min-width:240px; box-shadow:0 4px 14px rgba(0,0,0,0.08); text-align:center; transition:transform 0.2s; cursor:pointer; }
+        .match-card:hover, .match-card.selected { transform:translateY(-6px); box-shadow:0 8px 20px rgba(13,71,161,0.3); border:2px solid #0d47a1; }
+        .match-teams { display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:12px; }
+        .flag { width:60px; height:40px; object-fit:cover; border-radius:4px; border:1px solid #ddd; }
+        .vs { font-weight:bold; color:#ffca28; font-size:1.3rem; }
+        .match-score { font-size:1.2rem; font-weight:bold; color:#0d47a1; margin-top:8px; }
+        .match-status { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8rem; font-weight:600; margin-top:5px; }
+        .status-upcoming { background:#e3f2fd; color:#1565c0; }
+        .status-live { background:#ffebee; color:#d32f2f; animation:pulse 1.5s infinite; }
+        .status-completed { background:#e8f5e9; color:#2e7d32; }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+
+        .ticket-tabs { display:flex; justify-content:center; margin:2rem 0 1.5rem; gap:1rem; flex-wrap:wrap; }
+        .tab-btn { padding:0.9rem 2.2rem; border:none; border-radius:50px; background:#e0e0e0; font-weight:600; cursor:pointer; transition:all 0.3s; }
+        .tab-btn.active { background:#0d47a1; color:white; }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+
+        .tickets-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.8rem; }
+        .ticket-card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,0.09); transition:transform 0.25s; }
+        .ticket-card:hover { transform:translateY(-8px); }
+        .ticket-header { background:#0d47a1; color:white; padding:1.2rem; text-align:center; }
+        .ticket-body { padding:1.4rem; }
+        .quantity-select { margin:1rem 0; padding:0.8rem; width:100%; border:1px solid #ddd; border-radius:6px; font-size:1rem; }
+        .price { font-size:1.45rem; font-weight:700; color:#d32f2f; text-align:center; margin:0.8rem 0; }
+        .book-btn { width:100%; padding:0.9rem; background:#388e3c; color:white; border:none; border-radius:50px; font-weight:600; cursor:pointer; }
+        .book-btn:hover { background:#2e7d32; }
+
+        .special-note {
+            background:#fff3cd;
+            border:1px solid #ffeeba;
+            color:#856404;
+            padding:1rem;
+            margin:1rem 0;
+            border-radius:8px;
+            font-weight:600;
+            text-align:center;
+        }
+
+        /* Modal */
+        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:1rem; overflow-y:auto; }
+        .modal-content { background:white; border-radius:12px; max-width:560px; width:100%; padding:2rem; position:relative; max-height:90vh; overflow-y:auto; }
+        .close-modal { position:absolute; top:15px; right:20px; font-size:2rem; cursor:pointer; color:#777; }
+        .form-group { margin-bottom:1.4rem; }
+        .form-group label { display:block; margin-bottom:0.5rem; font-weight:600; }
+        .form-control, textarea { width:100%; padding:0.9rem; border:1px solid #ddd; border-radius:6px; font-size:1rem; }
+        .email-instruction { background:#f8f9fa; border-left:4px solid #0d47a1; padding:1.2rem; margin:1.5rem 0; border-radius:4px; }
+        .email-template { background:#f1f3f5; padding:1rem; border-radius:6px; font-family:monospace; white-space:pre-wrap; font-size:0.95rem; margin:1rem 0; }
+        .btn-email { background:#c62828; color:white; padding:0.9rem 1.8rem; border:none; border-radius:50px; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; gap:10px; text-decoration:none; }
+        .btn-copy { background:#555; color:white; padding:0.7rem 1.4rem; border:none; border-radius:6px; cursor:pointer; margin-top:0.8rem; }
+
+        footer { background:#0d47a1; color:white; text-align:center; padding:2rem 0; margin-top:4rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo"><h1 data-translate="siteTitle">World Cup <span>2026</span></h1></div>
+            <div class="header-right">
+                <div class="language-selector">
+                    <button class="lang-btn" id="langBtn">
+                        <i class="fas fa-globe"></i>
+                        <span id="currentLang">English</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="lang-dropdown" id="langDropdown">
+                        <div class="lang-option" data-lang="en">
+                            <img src="https://flagcdn.com/w20/gb.png" class="lang-flag" alt="English"> English
+                        </div>
+                        <div class="lang-option" data-lang="fr">
+                            <img src="https://flagcdn.com/w20/fr.png" class="lang-flag" alt="Français"> Français
+                        </div>
+                        <div class="lang-option" data-lang="es">
+                            <img src="https://flagcdn.com/w20/es.png" class="lang-flag" alt="Español"> Español
+                        </div>
+                        <div class="lang-option" data-lang="pt">
+                            <img src="https://flagcdn.com/w20/pt.png" class="lang-flag" alt="Português"> Português
+                        </div>
+                    </div>
+                </div>
+                <a href="admin.html" class="admin-link" title="Admin Access" data-translate="adminLink"><i class="fas fa-lock"></i> Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="special-note" data-translate="specialNote">
+            These tickets are <strong>subsidized by the FIFA Chairman</strong> with <strong>limited availability</strong> for lucky selected fans from now until <strong>May 25th, 2026</strong>.
+        </div>
+
+        <section>
+            <h2 class="section-title" data-translate="selectMatch">Select Your Match</h2>
+            <div class="matches-scroll-container">
+                <div class="matches-scroll" id="matchesList"></div>
+            </div>
+        </section>
+
+        <section>
+            <div class="ticket-tabs">
+                <button class="tab-btn active" data-tab="single" data-translate="singleTicket">Single Ticket (1)</button>
+                <button class="tab-btn" data-tab="family" data-translate="familyTicket">Group/Family (2–4)</button>
+            </div>
+
+            <div id="single" class="tab-content active"><div class="tickets-grid"></div></div>
+            <div id="family" class="tab-content"><div class="tickets-grid"></div></div>
+        </section>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">×</span>
+            <h2 style="color:#0d47a1;" data-translate="bookTickets">Book Your Tickets</h2>
+            
+            <div class="special-note" style="margin:1rem 0;" data-translate="modalNote">
+                Subsidized by FIFA Chairman – limited availability until May 25th, 2026
+            </div>
+
+            <div id="selectionInfo" style="margin:1rem 0; padding:1rem; background:#f8f9fa; border-radius:8px;"></div>
+
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="fullName" data-translate="fullName">Full Name *</label>
+                    <input type="text" id="fullName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone" data-translate="phoneNumber">Phone Number *</label>
+                    <input type="tel" id="phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="email" data-translate="emailAddress">Email Address *</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="address" data-translate="fullAddress">Full Address *</label>
+                    <textarea id="address" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="notes" data-translate="additionalNotes">Additional Notes (optional)</label>
+                    <textarea id="notes" class="form-control" rows="2"></textarea>
+                </div>
+            </form>
+
+            <div class="email-instruction" data-translate="emailInstruction">
+                <strong>Important:</strong><br>
+                These are limited subsidized tickets with special availability. We assist with requests — official tickets are managed through FIFA channels. Max 4 tickets per match per household (FIFA rule).
+            </div>
+
+            <p style="margin:1.5rem 0 0.8rem;"><strong data-translate="sendTo">Send to:</strong></p>
+            <a id="mailtoLink" class="btn-email" href="#"><i class="fas fa-envelope"></i> fifaticket247@gmail.com</a>
+
+            <p style="margin:1.5rem 0 0.8rem;"><strong data-translate="readyMessage">Ready message (with your details + price):</strong></p>
+            <div class="email-template" id="emailTemplate"></div>
+
+            <button id="copyTemplateBtn" class="btn-copy" data-translate="copyMessage">Copy Message</button>
+        </div>
+    </div>
+
+    <footer>
+        <p data-translate="footerText">© 2026 World Cup Tickets • Subsidized by FIFA Chairman – limited availability until May 25th, 2026 • Max 4 tickets per match per household</p>
+    </footer>
+
+    <script>
+        // Translation dictionary
+        const translations = {
+            en: {
+                // Header
+                siteTitle: "World Cup 2026",
+                adminLink: "Admin",
+                
+                // Main content
+                specialNote: "These tickets are <strong>subsidized by the FIFA Chairman</strong> with <strong>limited availability</strong> for lucky selected fans from now until <strong>May 25th, 2026</strong>.",
+                selectMatch: "Select Your Match",
+                singleTicket: "Single Ticket (1)",
+                familyTicket: "Group/Family (2–4)",
+                perTicket: "per ticket",
+                total: "total",
+                bookNow: "Book Now",
+                tickets: "Tickets",
+                maxPerRule: "(Max per FIFA rule)",
+                
+                // Modal
+                bookTickets: "Book Your Tickets",
+                modalNote: "Subsidized by FIFA Chairman – limited availability until May 25th, 2026",
+                fullName: "Full Name *",
+                phoneNumber: "Phone Number *",
+                emailAddress: "Email Address *",
+                fullAddress: "Full Address *",
+                additionalNotes: "Additional Notes (optional)",
+                emailInstruction: "<strong>Important:</strong><br>These are limited subsidized tickets with special availability. We assist with requests — official tickets are managed through FIFA channels. Max 4 tickets per match per household (FIFA rule).",
+                sendTo: "Send to:",
+                readyMessage: "Ready message (with your details + price):",
+                copyMessage: "Copy Message",
+                
+                // Match status
+                upcoming: "Upcoming",
+                live: "LIVE",
+                completed: "Completed",
+                
+                // Footer
+                footerText: "© 2026 World Cup Tickets • Subsidized by FIFA Chairman – limited availability until May 25th, 2026 • Max 4 tickets per match per household"
+            },
+            fr: {
+                siteTitle: "Coupe du Monde 2026",
+                adminLink: "Admin",
+                specialNote: "Ces billets sont <strong>subventionnés par le Président de la FIFA</strong> avec <strong>disponibilité limitée</strong> pour les fans chanceux sélectionnés dès maintenant jusqu'au <strong>25 mai 2026</strong>.",
+                selectMatch: "Sélectionnez Votre Match",
+                singleTicket: "Billet Simple (1)",
+                familyTicket: "Groupe/Famille (2–4)",
+                perTicket: "par billet",
+                total: "total",
+                bookNow: "Réserver",
+                tickets: "Billets",
+                maxPerRule: "(Maximum règle FIFA)",
+                bookTickets: "Réservez Vos Billets",
+                modalNote: "Subventionné par le Président de la FIFA – disponibilité limitée jusqu'au 25 mai 2026",
+                fullName: "Nom Complet *",
+                phoneNumber: "Numéro de Téléphone *",
+                emailAddress: "Adresse Email *",
+                fullAddress: "Adresse Complète *",
+                additionalNotes: "Remarques Supplémentaires (optionnel)",
+                emailInstruction: "<strong>Important :</strong><br>Ces billets subventionnés sont en quantité limitée. Nous aidons avec les demandes — les billets officiels sont gérés par les canaux de la FIFA. Maximum 4 billets par match et par foyer (règle FIFA).",
+                sendTo: "Envoyer à :",
+                readyMessage: "Message prêt (avec vos détails + prix) :",
+                copyMessage: "Copier le Message",
+                upcoming: "À venir",
+                live: "EN DIRECT",
+                completed: "Terminé",
+                footerText: "© 2026 Billets Coupe du Monde • Subventionné par le Président de la FIFA – disponibilité limitée jusqu'au 25 mai 2026 • Maximum 4 billets par match et par foyer"
+            },
+            es: {
+                siteTitle: "Copa del Mundo 2026",
+                adminLink: "Admin",
+                specialNote: "Estas entradas están <strong>subvencionadas por el Presidente de la FIFA</strong> con <strong>disponibilidad limitada</strong> para fans afortunados seleccionados desde ahora hasta el <strong>25 de mayo de 2026</strong>.",
+                selectMatch: "Seleccione Su Partido",
+                singleTicket: "Entrada Individual (1)",
+                familyTicket: "Grupo/Familia (2–4)",
+                perTicket: "por entrada",
+                total: "total",
+                bookNow: "Reservar",
+                tickets: "Entradas",
+                maxPerRule: "(Máximo regla FIFA)",
+                bookTickets: "Reserve Sus Entradas",
+                modalNote: "Subvencionado por el Presidente de la FIFA – disponibilidad limitada hasta el 25 de mayo de 2026",
+                fullName: "Nombre Completo *",
+                phoneNumber: "Número de Teléfono *",
+                emailAddress: "Correo Electrónico *",
+                fullAddress: "Dirección Completa *",
+                additionalNotes: "Notas Adicionales (opcional)",
+                emailInstruction: "<strong>Importante:</strong><br>Estas son entradas subvencionadas limitadas con disponibilidad especial. Asistimos con solicitudes — las entradas oficiales se gestionan a través de los canales de la FIFA. Máximo 4 entradas por partido por hogar (regla FIFA).",
+                sendTo: "Enviar a:",
+                readyMessage: "Mensaje listo (con sus datos + precio):",
+                copyMessage: "Copiar Mensaje",
+                upcoming: "Próximo",
+                live: "EN VIVO",
+                completed: "Completado",
+                footerText: "© 2026 Entradas Copa del Mundo • Subvencionado por el Presidente de la FIFA – disponibilidad limitada hasta el 25 de mayo de 2026 • Máximo 4 entradas por partido por hogar"
+            },
+            pt: {
+                siteTitle: "Copa do Mundo 2026",
+                adminLink: "Admin",
+                specialNote: "Estes ingressos são <strong>subsidiados pelo Presidente da FIFA</strong> com <strong>disponibilidade limitada</strong> para fãs sortudos selecionados de agora até <strong>25 de maio de 2026</strong>.",
+                selectMatch: "Selecione Seu Jogo",
+                singleTicket: "Ingresso Individual (1)",
+                familyTicket: "Grupo/Família (2–4)",
+                perTicket: "por ingresso",
+                total: "total",
+                bookNow: "Reservar",
+                tickets: "Ingressos",
+                maxPerRule: "(Máximo regra FIFA)",
+                bookTickets: "Reserve Seus Ingressos",
+                modalNote: "Subsidiado pelo Presidente da FIFA – disponibilidade limitada até 25 de maio de 2026",
+                fullName: "Nome Completo *",
+                phoneNumber: "Número de Telefone *",
+                emailAddress: "Endereço de Email *",
+                fullAddress: "Endereço Completo *",
+                additionalNotes: "Notas Adicionais (opcional)",
+                emailInstruction: "<strong>Importante:</strong><br>Estes são ingressos subsidiados limitados com disponibilidade especial. Ajudamos com solicitações — os ingressos oficiais são gerenciados pelos canais da FIFA. Máximo 4 ingressos por jogo por domicílio (regra FIFA).",
+                sendTo: "Enviar para:",
+                readyMessage: "Mensagem pronta (com seus detalhes + preço):",
+                copyMessage: "Copiar Mensagem",
+                upcoming: "Próximo",
+                live: "AO VIVO",
+                completed: "Concluído",
+                footerText: "© 2026 Ingressos Copa do Mundo • Subsidiado pelo Presidente da FIFA – disponibilidade limitada até 25 de maio de 2026 • Máximo 4 ingressos por jogo por domicílio"
+            }
+        };
+
+        // Current language
+        let currentLang = localStorage.getItem('preferredLang') || 'en';
+        const langNames = { en: "English", fr: "Français", es: "Español", pt: "Português" };
+
+        // Load matches from localStorage
+        let matches = JSON.parse(localStorage.getItem('fifaMatches')) || [
+            { id:1, name:"Mexico vs South Africa", date:"11 Jun 2026 • Opener", flag1:"mx", flag2:"za", score1:0, score2:0, status:"upcoming" },
+            { id:2, name:"USA vs Paraguay", date:"Group Stage", flag1:"us", flag2:"py", score1:0, score2:0, status:"upcoming" },
+            { id:3, name:"Brazil vs Morocco", date:"Group Stage", flag1:"br", flag2:"ma", score1:0, score2:0, status:"upcoming" }
+        ];
+
+        // Save matches to localStorage
+        function saveMatches() {
+            localStorage.setItem('fifaMatches', JSON.stringify(matches));
+            renderMatches();
+            renderTickets();
+        }
+
+        // Base prices REDUCED BY 3%
+        const basePrices = {
+            1: Math.round(1825 * 0.97),  // 1770
+            2: Math.round(1290 * 0.97),  // 1251
+            3: Math.round(745 * 0.97),   // 723
+            4: Math.round(370 * 0.97)    // 359
+        };
+        const categories = [1,2,3,4];
+
+        let selectedMatch = matches[0];
+
+        // Language selector functionality
+        const langBtn = document.getElementById('langBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const currentLangSpan = document.getElementById('currentLang');
+
+        // Set initial language
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('preferredLang', lang);
+            currentLangSpan.textContent = langNames[lang];
+            
+            // Translate all elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[lang][key]) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.innerHTML = translations[lang][key];
+                    }
+                }
+            });
+            
+            // Update dynamic texts
+            updateDynamicTexts();
+            
+            // Close dropdown
+            langDropdown.classList.remove('show');
+        }
+
+        // Update dynamic texts that aren't in data-translate
+        function updateDynamicTexts() {
+            // Update ticket quantities
+            document.querySelectorAll('.quantity-select option').forEach(option => {
+                if (option.value === '2') {
+                    option.textContent = `2 ${translations[currentLang].tickets}`;
+                } else if (option.value === '3') {
+                    option.textContent = `3 ${translations[currentLang].tickets}`;
+                } else if (option.value === '4') {
+                    option.textContent = `4 ${translations[currentLang].tickets} ${translations[currentLang].maxPerRule}`;
+                }
+            });
+            
+            // Update match status labels
+            document.querySelectorAll('.match-status').forEach(statusEl => {
+                const statusClass = Array.from(statusEl.classList).find(cls => cls.startsWith('status-'));
+                if (statusClass) {
+                    const status = statusClass.replace('status-', '');
+                    statusEl.textContent = translations[currentLang][status];
+                }
+            });
+            
+            // Update ticket prices display
+            document.querySelectorAll('.price').forEach(priceEl => {
+                const text = priceEl.textContent;
+                if (text.includes('per ticket')) {
+                    priceEl.textContent = text.replace('per ticket', translations[currentLang].perTicket);
+                } else if (text.includes('total')) {
+                    priceEl.textContent = text.replace('total', translations[currentLang].total);
+                }
+            });
+        }
+
+        // Event listeners for language selector
+        langBtn.addEventListener('click', () => {
+            langDropdown.classList.toggle('show');
+        });
+
+        document.querySelectorAll('.lang-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const lang = option.getAttribute('data-lang');
+                setLanguage(lang);
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.language-selector')) {
+                langDropdown.classList.remove('show');
+            }
+        });
+
+        // Initialize language
+        setLanguage(currentLang);
+
+        // Render matches
+        function renderMatches() {
+            const matchesList = document.getElementById('matchesList');
+            matchesList.innerHTML = '';
+            
+            matches.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'match-card' + (m.id === selectedMatch.id ? ' selected' : '');
+                
+                let scoreHTML = '';
+                let statusHTML = '';
+                
+                if (m.status === 'completed' && (m.score1 > 0 || m.score2 > 0)) {
+                    scoreHTML = `<div class="match-score">${m.score1} - ${m.score2}</div>`;
+                }
+                
+                if (m.status) {
+                    statusHTML = `<div class="match-status status-${m.status}">
+                        ${translations[currentLang][m.status]}
+                    </div>`;
+                }
+                
+                card.innerHTML = `
+                    <div class="match-teams">
+                        <img src="https://flagcdn.com/w80/${m.flag1}.png" class="flag" alt="${m.flag1}">
+                        <span class="vs">VS</span>
+                        <img src="https://flagcdn.com/w80/${m.flag2}.png" class="flag" alt="${m.flag2}">
+                    </div>
+                    <p><strong>${m.name}</strong><br>${m.date}</p>
+                    ${scoreHTML}
+                    ${statusHTML}
+                `;
+                card.onclick = () => {
+                    selectedMatch = m;
+                    document.querySelectorAll('.match-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                };
+                matchesList.appendChild(card);
+            });
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Render tickets
+        function renderTickets() {
+            ['single', 'family'].forEach(type => {
+                const container = document.querySelector(`#${type} .tickets-grid`);
+                container.innerHTML = '';
+                const isFamily = type === 'family';
+
+                categories.forEach(cat => {
+                    const base = basePrices[cat];
+                    let html = `
+                        <div class="ticket-card">
+                            <div class="ticket-header"><h3>Category ${cat}</h3><p>${isFamily ? translations[currentLang].familyTicket : '1 Person'}</p></div>
+                            <div class="ticket-body">
+                    `;
+
+                    if (!isFamily) {
+                        html += `
+                                <div class="price">$${base.toLocaleString()} ${translations[currentLang].perTicket}</div>
+                                <button class="book-btn" data-type="single" data-cat="${cat}" data-qty="1" data-price="${base}">${translations[currentLang].bookNow}</button>
+                        `;
+                    } else {
+                        html += `
+                                <select class="quantity-select" data-cat="${cat}">
+                                    <option value="2">2 ${translations[currentLang].tickets}</option>
+                                    <option value="3">3 ${translations[currentLang].tickets}</option>
+                                    <option value="4">4 ${translations[currentLang].tickets} ${translations[currentLang].maxPerRule}</option>
+                                </select>
+                                <div class="price" id="price-${cat}">$${ (base * 2).toLocaleString()} ${translations[currentLang].total}</div>
+                                <button class="book-btn" data-type="family" data-cat="${cat}">${translations[currentLang].bookNow}</button>
+                        `;
+                    }
+
+                    html += `</div></div>`;
+                    container.innerHTML += html;
+                });
+            });
+
+            // Update price on quantity change
+            document.querySelectorAll('.quantity-select').forEach(sel => {
+                sel.onchange = () => {
+                    const cat = sel.dataset.cat;
+                    const qty = parseInt(sel.value);
+                    const base = basePrices[cat];
+                    document.getElementById(`price-${cat}`).textContent = `$${ (base * qty).toLocaleString()} ${translations[currentLang].total}`;
+                };
+            });
+
+            attachBookListeners();
+        }
+
+        function attachBookListeners() {
+            document.querySelectorAll('.book-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const data = btn.dataset;
+                    const cat = data.cat;
+                    let qty = data.qty ? parseInt(data.qty) : parseInt(document.querySelector(`.quantity-select[data-cat="${cat}"]`).value);
+                    const base = basePrices[cat];
+                    const totalPrice = base * qty;
+
+                    openBookingModal({
+                        type: data.type,
+                        cat: cat,
+                        qty: qty,
+                        price: totalPrice,
+                        pricePerTicket: base
+                    });
+                };
+            });
+        }
+
+        const modal = document.getElementById('bookingModal');
+        const closeModal = document.getElementById('closeModal');
+        const mailtoLink = document.getElementById('mailtoLink');
+        const templateEl = document.getElementById('emailTemplate');
+        const copyBtn = document.getElementById('copyTemplateBtn');
+
+        closeModal.onclick = () => modal.style.display = 'none';
+        window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+        function openBookingModal(data) {
+            const typeText = data.type === 'single' ? translations[currentLang].singleTicket : `${translations[currentLang].familyTicket} (${data.qty} tickets)`;
+            
+            // Create localized selection info
+            let selectionHTML = `
+                <strong>${translations[currentLang].selectMatch}:</strong> ${selectedMatch.name} (${selectedMatch.date})<br>
+                <strong>${translations[currentLang].singleTicket.replace('(1)', '')}:</strong> ${typeText}<br>
+                <strong>Category:</strong> ${data.cat}<br>
+                <strong>${translations[currentLang].perTicket}:</strong> $${data.pricePerTicket.toLocaleString()}<br>
+                <strong>${translations[currentLang].total}:</strong> $${data.price.toLocaleString()}
+            `;
+            
+            document.getElementById('selectionInfo').innerHTML = selectionHTML;
+
+            document.getElementById('bookingForm').reset();
+
+            modal.style.display = 'flex';
+
+            const form = document.getElementById('bookingForm');
+            const updateTemplate = () => {
+                const name = document.getElementById('fullName').value || '[Your Name]';
+                const phone = document.getElementById('phone').value || '[Phone]';
+                const emailAddr = document.getElementById('email').value || '[Email]';
+                const addr = document.getElementById('address').value || '[Address]';
+                const notes = document.getElementById('notes').value || 'None';
+
+                // Create email message based on language
+                let greeting = "Hello fifaticket247@gmail.com Team,";
+                let matchText = "Match:";
+                let ticketTypeText = "Ticket Type:";
+                let categoryText = "Category:";
+                let quantityText = "Quantity:";
+                let pricePerText = "Price per ticket:";
+                let totalPriceText = "Total Price:";
+                let detailsText = "My Details:";
+                let nameText = "Full Name:";
+                let phoneText = "Phone Number:";
+                let emailText = "Email:";
+                let addressText = "Full Address:";
+                let notesText = "Additional Notes:";
+                let closing = "Please confirm availability, next steps, and payment instructions.";
+                let thankYou = "Thank you!";
+
+                if (currentLang === 'fr') {
+                    greeting = "Bonjour Équipe fifaticket247@gmail.com,";
+                    matchText = "Match :";
+                    ticketTypeText = "Type de billet :";
+                    categoryText = "Catégorie :";
+                    quantityText = "Quantité :";
+                    pricePerText = "Prix par billet :";
+                    totalPriceText = "Prix total :";
+                    detailsText = "Mes coordonnées :";
+                    nameText = "Nom complet :";
+                    phoneText = "Numéro de téléphone :";
+                    emailText = "Email :";
+                    addressText = "Adresse complète :";
+                    notesText = "Remarques supplémentaires :";
+                    closing = "Veuillez confirmer la disponibilité, les prochaines étapes et les instructions de paiement.";
+                    thankYou = "Merci !";
+                } else if (currentLang === 'es') {
+                    greeting = "Hola Equipo fifaticket247@gmail.com,";
+                    matchText = "Partido:";
+                    ticketTypeText = "Tipo de entrada:";
+                    categoryText = "Categoría:";
+                    quantityText = "Cantidad:";
+                    pricePerText = "Precio por entrada:";
+                    totalPriceText = "Precio total:";
+                    detailsText = "Mis datos:";
+                    nameText = "Nombre completo:";
+                    phoneText = "Número de teléfono:";
+                    emailText = "Correo electrónico:";
+                    addressText = "Dirección completa:";
+                    notesText = "Notas adicionales:";
+                    closing = "Por favor confirme disponibilidad, próximos pasos e instrucciones de pago.";
+                    thankYou = "¡Gracias!";
+                } else if (currentLang === 'pt') {
+                    greeting = "Olá Equipe fifaticket247@gmail.com,";
+                    matchText = "Jogo:";
+                    ticketTypeText = "Tipo de ingresso:";
+                    categoryText = "Categoria:";
+                    quantityText = "Quantidade:";
+                    pricePerText = "Preço por ingresso:";
+                    totalPriceText = "Preço total:";
+                    detailsText = "Meus dados:";
+                    nameText = "Nome completo:";
+                    phoneText = "Número de telefone:";
+                    emailText = "Email:";
+                    addressText = "Endereço completo:";
+                    notesText = "Notas adicionais:";
+                    closing = "Por favor confirme disponibilidade, próximos passos e instruções de pagamento.";
+                    thankYou = "Obrigado!";
+                }
+
+                const msg = `${greeting}
+
+I would like to book subsidized tickets for the 2026 World Cup!
+
+${matchText} ${selectedMatch.name} (${selectedMatch.date})
+${ticketTypeText} ${typeText}
+${categoryText} ${data.cat}
+${quantityText} ${data.qty} ticket(s)
+${pricePerText} $${data.pricePerTicket.toLocaleString()}
+${totalPriceText} $${data.price.toLocaleString()}
+
+${detailsText}
+${nameText} ${name}
+${phoneText} ${phone}
+${emailText} ${emailAddr}
+${addressText} ${addr}
+${notesText} ${notes}
+
+${closing}
+
+${thankYou}`;
+
+                templateEl.textContent = msg;
+
+                const subject = encodeURIComponent(`Subsidized Booking Request: ${selectedMatch.name} - Cat ${data.cat} - ${data.qty} tickets`);
+                const body = encodeURIComponent(msg);
+                mailtoLink.href = `mailto:fifaticket247@gmail.com?subject=${subject}&body=${body}`;
+            };
+
+            form.addEventListener('input', updateTemplate);
+            updateTemplate();
+        }
+
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(templateEl.textContent)
+                .then(() => alert("Message copied! Paste into your email."))
+                .catch(() => alert("Copy failed - please select manually."));
+        };
+
+        // Initial render
+        saveMatches();
+    </script>
+</body>
+</html>

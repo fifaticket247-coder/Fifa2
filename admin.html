@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA World Cup 2026 - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .admin-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-header p {
+            opacity: 0.9;
+        }
+
+        .language-selector-admin {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .lang-btn-admin {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .lang-dropdown-admin {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            color: #333;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-width: 150px;
+            z-index: 1000;
+        }
+
+        .lang-dropdown-admin.show {
+            display: block;
+        }
+
+        .lang-option-admin {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lang-option-admin:hover {
+            background: #f5f7fa;
+        }
+
+        .lang-flag {
+            width: 20px;
+            height: 15px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .admin-content {
+            padding: 2rem;
+        }
+
+        .login-box {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-box {
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f7fa;
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .tab-btn.active {
+            background: #0d47a1;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: #0d47a1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1565c0;
+        }
+
+        .btn-success {
+            background: #388e3c;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2e7d32;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c62828;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .matches-list {
+            margin-top: 2rem;
+            border-top: 2px solid #eee;
+            padding-top: 1.5rem;
+        }
+
+        .match-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .match-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .match-info h4 {
+            margin-bottom: 5px;
+            color: #0d47a1;
+        }
+
+        .match-info p {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 3px 0;
+        }
+
+        .match-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .score-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .score-input {
+            width: 60px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .status-select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #0d47a1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .match-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .match-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .tab-btn {
+                min-width: 120px;
+            }
+            
+            .language-selector-admin {
+                position: static;
+                margin-top: 1rem;
+                display: flex;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1 data-translate="adminTitle">FIFA World Cup 2026 Admin</h1>
+            <p data-translate="adminSubtitle">Manage matches, scores, and tickets</p>
+            
+            <div class="language-selector-admin">
+                <button class="lang-btn-admin" id="langBtnAdmin">
+                    <i class="fas fa-globe"></i>
+                    <span id="currentLangAdmin">English</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="lang-dropdown-admin" id="langDropdownAdmin">
+                    <div class="lang-option-admin" data-lang="en">
+                        <img src="https://flagcdn.com/w20/gb.png" class="lang-flag" alt="English"> English
+                    </div>
+                    <div class="lang-option-admin" data-lang="fr">
+                        <img src="https://flagcdn.com/w20/fr.png" class="lang-flag" alt="Français"> Français
+                    </div>
+                    <div class="lang-option-admin" data-lang="es">
+                        <img src="https://flagcdn.com/w20/es.png" class="lang-flag" alt="Español"> Español
+                    </div>
+                    <div class="lang-option-admin" data-lang="pt">
+                        <img src="https://flagcdn.com/w20/pt.png" class="lang-flag" alt="Português"> Português
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-content">
+            <!-- Login Box -->
+            <div id="loginBox" class="login-box">
+                <h2 style="margin-bottom: 2rem; color: #0d47a1; text-align: center;" data-translate="loginTitle">Admin Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="adminUsername" data-translate="username">Username</label>
+                        <input type="text" id="adminUsername" class="form-control" placeholder="Enter username" required value="admin">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword" data-translate="password">Password</label>
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter password" required value="admin123">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-sign-in-alt"></i> <span data-translate="loginBtn">Sign In</span>
+                        </button>
+                    </div>
+                    <p style="text-align: center; color: #666; margin-top: 1rem; font-size: 0.9rem;" data-translate="loginNote">
+                        Default credentials: <strong>admin</strong> / <strong>admin123</strong>
+                    </p>
+                </form>
+            </div>
+
+            <!-- Dashboard Box -->
+            <div id="dashboardBox" class="dashboard-box">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="matches" data-translate="manageMatches">Manage Matches</button>
+                    <button class="tab-btn" data-tab="scores" data-translate="updateScores">Update Scores</button>
+                    <button class="tab-btn" data-tab="tickets" data-translate="ticketSettings">Ticket Settings</button>
+                </div>
+
+                <!-- Alerts -->
+                <div id="alertSuccess" class="alert alert-success"></div>
+                <div id="alertError" class="alert alert-danger"></div>
+
+                <!-- Matches Management Tab -->
+                <div id="matchesTab" class="tab-content active">
+                    <h3 data-translate="addNewMatch">Add New Match</h3>
+                    <form id="addMatchForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="team1Name">Team 1 Name</label>
+                                <input type="text" id="team1Name" class="form-control" placeholder="e.g., Brazil" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="team1Flag">Team 1 Flag Code</label>
+                                <input type="text" id="team1Flag" class="form-control" placeholder="e.g., br" required>
+                                <small style="color: #666;" data-translate="flagNote">Use 2-letter country codes like: us, gb, fr, de, br</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="team2Name">Team 2 Name</label>
+                                <input type="text" id="team2Name" class="form-control" placeholder="e.g., Argentina" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="team2Flag">Team 2 Flag Code</label>
+                                <input type="text" id="team2Flag" class="form-control" placeholder="e.g., ar" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="matchDate">Match Date/Stage</label>
+                                <input type="text" id="matchDate" class="form-control" placeholder="e.g., 11 Jun 2026 • Opener" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="matchStatus">Status</label>
+                                <select id="matchStatus" class="form-control">
+                                    <option value="upcoming" data-translate="upcoming">Upcoming</option>
+                                    <option value="live" data-translate="live">Live</option>
+                                    <option value="completed" data-translate="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus"></i> <span data-translate="addMatchBtn">Add Match</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="matches-list">
+                        <h3 data-translate="currentMatches">Current Matches (Total: <span id="matchCount">0</span>)</h3>
+                        <div id="matchesList">
+                            <!-- Matches will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scores Update Tab -->
+                <div id="scoresTab" class="tab-content">
+                    <h3 data-translate="updateMatchScores">Update Match Scores</h3>
+                    <p style="color: #666; margin-bottom: 1.5rem;" data-translate="updateScoresDesc">Update scores and status for existing matches</p>
+                    <div id="scoresList">
+                        <!-- Matches with scores will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Ticket Prices Tab -->
+                <div id="ticketsTab" class="tab-content">
+                    <h3 data-translate="ticketPriceSettings">Ticket Price Settings</h3>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <h3 id="totalMatches">0</h3>
+                            <p data-translate="totalMatches">Total Matches</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="liveMatches">0</h3>
+                            <p data-translate="liveMatches">Live Matches</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="completedMatches">0</h3>
+                            <p data-translate="completedMatches">Completed</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-translate="discountPercentage">Discount Percentage</label>
+                        <input type="number" id="discountPercent" class="form-control" value="3" min="0" max="100">
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;" data-translate="discountNote">
+                            Current discount applied to all ticket prices (3% = prices are 97% of original)
+                        </p>
+                    </div>
+
+                    <h4 style="margin-top: 2rem;" data-translate="basePrices">Base Prices (Before Discount)</h4>
+                    <form id="pricesForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="category1">Category 1 (Premium)</label>
+                                <input type="number" id="priceCat1" class="form-control" value="1825" min="0">
+                                <p style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;" data-translate="afterDiscount">
+                                    After discount: $<span id="discountedPrice1">1770</span>
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="category2">Category 2 (Standard)</label>
+                                <input type="number" id="priceCat2" class="form-control" value="1290" min="0">
+                                <p style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;" data-translate="afterDiscount">
+                                    After discount: $<span id="discountedPrice2">1251</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="category3">Category 3 (Economy)</label>
+                                <input type="number" id="priceCat3" class="form-control" value="745" min="0">
+                                <p style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;" data-translate="afterDiscount">
+                                    After discount: $<span id="discountedPrice3">723</span>
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="category4">Category 4 (Budget)</label>
+                                <input type="number" id="priceCat4" class="form-control" value="370" min="0">
+                                <p style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;" data-translate="afterDiscount">
+                                    After discount: $<span id="discountedPrice4">359</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> <span data-translate="savePricesBtn">Save Price Changes</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid #eee; text-align: center;">
+                    <button id="logoutBtn" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> <span data-translate="logoutBtn">Logout</span>
+                    </button>
+                    <button id="refreshBtn" class="btn" style="background: #666; color: white; margin-left: 10px;">
+                        <i class="fas fa-sync-alt"></i> <span data-translate="refreshBtn">Refresh Data</span>
+                    </button>
+                    <a href="index.html" class="btn" style="background: #0d47a1; color: white; margin-left: 10px; text-decoration: none;">
+                        <i class="fas fa-eye"></i> <span data-translate="viewSiteBtn">View Public Site</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Admin credentials
+        const ADMIN_USER = 'admin';
+        const ADMIN_PASS = 'admin123';
+
+        // Translation dictionary for admin
+        const translations = {
+            en: {
+                adminTitle: "FIFA World Cup 2026 Admin",
+                adminSubtitle: "Manage matches, scores, and tickets",
+                loginTitle: "Admin Login",
+                username: "Username",
+                password: "Password",
+                loginBtn: "Sign In",
+                loginNote: "Default credentials: <strong>admin</strong> / <strong>admin123</strong>",
+                manageMatches: "Manage Matches",
+                updateScores: "Update Scores",
+                ticketSettings: "Ticket Settings",
+                addNewMatch: "Add New Match",
+                team1Name: "Team 1 Name",
+                team1Flag: "Team 1 Flag Code",
+                team2Name: "Team 2 Name",
+                team2Flag: "Team 2 Flag Code",
+                matchDate: "Match Date/Stage",
+                matchStatus: "Status",
+                upcoming: "Upcoming",
+                live: "Live",
+                completed: "Completed",
+                flagNote: "Use 2-letter country codes like: us, gb, fr, de, br",
+                addMatchBtn: "Add Match",
+                currentMatches: "Current Matches",
+                deleteBtn: "Delete",
+                updateMatchScores: "Update Match Scores",
+                updateScoresDesc: "Update scores and status for existing matches",
+                saveBtn: "Save",
+                ticketPriceSettings: "Ticket Price Settings",
+                totalMatches: "Total Matches",
+                liveMatches: "Live Matches",
+                completedMatches: "Completed",
+                discountPercentage: "Discount Percentage",
+                discountNote: "Current discount applied to all ticket prices (3% = prices are 97% of original)",
+                basePrices: "Base Prices (Before Discount)",
+                category1: "Category 1 (Premium)",
+                category2: "Category 2 (Standard)",
+                category3: "Category 3 (Economy)",
+                category4: "Category 4 (Budget)",
+                afterDiscount: "After discount: $",
+                savePricesBtn: "Save Price Changes",
+                logoutBtn: "Logout",
+                refreshBtn: "Refresh Data",
+                viewSiteBtn: "View Public Site"
+            },
+            fr: {
+                adminTitle: "Admin Coupe du Monde FIFA 2026",
+                adminSubtitle: "Gérer les matchs, scores et billets",
+                loginTitle: "Connexion Admin",
+                username: "Nom d'utilisateur",
+                password: "Mot de passe",
+                loginBtn: "Se Connecter",
+                loginNote: "Identifiants par défaut: <strong>admin</strong> / <strong>admin123</strong>",
+                manageMatches: "Gérer les Matchs",
+                updateScores: "Mettre à Jour les Scores",
+                ticketSettings: "Paramètres des Billets",
+                addNewMatch: "Ajouter un Nouveau Match",
+                team1Name: "Nom Équipe 1",
+                team1Flag: "Code Drapeau Équipe 1",
+                team2Name: "Nom Équipe 2",
+                team2Flag: "Code Drapeau Équipe 2",
+                matchDate: "Date/Étape du Match",
+                matchStatus: "Statut",
+                upcoming: "À venir",
+                live: "En direct",
+                completed: "Terminé",
+                flagNote: "Utilisez des codes pays à 2 lettres comme: us, gb, fr, de, br",
+                addMatchBtn: "Ajouter Match",
+                currentMatches: "Matchs Actuels",
+                deleteBtn: "Supprimer",
+                updateMatchScores: "Mettre à Jour les Scores",
+                updateScoresDesc: "Mettre à jour les scores et statuts des matchs existants",
+                saveBtn: "Enregistrer",
+                ticketPriceSettings: "Paramètres des Prix des Billets",
+                totalMatches: "Total Matchs",
+                liveMatches: "Matchs en Direct",
+                completedMatches: "Terminés",
+                discountPercentage: "Pourcentage de Réduction",
+                discountNote: "Réduction actuelle appliquée à tous les prix (3% = prix à 97% de l'original)",
+                basePrices: "Prix de Base (Avant Réduction)",
+                category1: "Catégorie 1 (Premium)",
+                category2: "Catégorie 2 (Standard)",
+                category3: "Catégorie 3 (Économique)",
+                category4: "Catégorie 4 (Budget)",
+                afterDiscount: "Après réduction: $",
+                savePricesBtn: "Enregistrer les Modifications",
+                logoutBtn: "Déconnexion",
+                refreshBtn: "Actualiser les Données",
+                viewSiteBtn: "Voir le Site Public"
+            },
+            es: {
+                adminTitle: "Admin Copa del Mundo FIFA 2026",
+                adminSubtitle: "Gestionar partidos, puntuaciones y entradas",
+                loginTitle: "Inicio de Sesión Admin",
+                username: "Nombre de usuario",
+                password: "Contraseña",
+                loginBtn: "Iniciar Sesión",
+                loginNote: "Credenciales por defecto: <strong>admin</strong> / <strong>admin123</strong>",
+                manageMatches: "Gestionar Partidos",
+                updateScores: "Actualizar Puntuaciones",
+                ticketSettings: "Configuración de Entradas",
+                addNewMatch: "Agregar Nuevo Partido",
+                team1Name: "Nombre Equipo 1",
+                team1Flag: "Código Bandera Equipo 1",
+                team2Name: "Nombre Equipo 2",
+                team2Flag: "Código Bandera Equipo 2",
+                matchDate: "Fecha/Etapa del Partido",
+                matchStatus: "Estado",
+                upcoming: "Próximo",
+                live: "En vivo",
+                completed: "Completado",
+                flagNote: "Use códigos de país de 2 letras como: us, gb, fr, de, br",
+                addMatchBtn: "Agregar Partido",
+                currentMatches: "Partidos Actuales",
+                deleteBtn: "Eliminar",
+                updateMatchScores: "Actualizar Puntuaciones",
+                updateScoresDesc: "Actualizar puntuaciones y estado de partidos existentes",
+                saveBtn: "Guardar",
+                ticketPriceSettings: "Configuración de Precios de Entradas",
+                totalMatches: "Total Partidos",
+                liveMatches: "Partidos en Vivo",
+                completedMatches: "Completados",
+                discountPercentage: "Porcentaje de Descuento",
+                discountNote: "Descuento actual aplicado a todos los precios (3% = precios al 97% del original)",
+                basePrices: "Precios Base (Antes del Descuento)",
+                category1: "Categoría 1 (Premium)",
+                category2: "Categoría 2 (Estándar)",
+                category3: "Categoría 3 (Económica)",
+                category4: "Categoría 4 (Presupuesto)",
+                afterDiscount: "Después del descuento: $",
+                savePricesBtn: "Guardar Cambios de Precio",
+                logoutBtn: "Cerrar Sesión",
+                refreshBtn: "Actualizar Datos",
+                viewSiteBtn: "Ver Sitio Público"
+            },
+            pt: {
+                adminTitle: "Admin Copa do Mundo FIFA 2026",
+                adminSubtitle: "Gerenciar jogos, pontuações e ingressos",
+                loginTitle: "Login Admin",
+                username: "Nome de usuário",
+                password: "Senha",
+                loginBtn: "Entrar",
+                loginNote: "Credenciais padrão: <strong>admin</strong> / <strong>admin123</strong>",
+                manageMatches: "Gerenciar Jogos",
+                updateScores: "Atualizar Pontuações",
+                ticketSettings: "Configurações de Ingressos",
+                addNewMatch: "Adicionar Novo Jogo",
+                team1Name: "Nome Time 1",
+                team1Flag: "Código Bandeira Time 1",
+                team2Name: "Nome Time 2",
+                team2Flag: "Código Bandeira Time 2",
+                matchDate: "Data/Etapa do Jogo",
+                matchStatus: "Status",
+                upcoming: "Próximo",
+                live: "Ao vivo",
+                completed: "Concluído",
+                flagNote: "Use códigos de país de 2 letras como: us, gb, fr, de, br",
+                addMatchBtn: "Adicionar Jogo",
+                currentMatches: "Jogos Atuais",
+                deleteBtn: "Excluir",
+                updateMatchScores: "Atualizar Pontuações",
+                updateScoresDesc: "Atualizar pontuações e status de jogos existentes",
+                saveBtn: "Salvar",
+                ticketPriceSettings: "Configurações de Preços de Ingressos",
+                totalMatches: "Total Jogos",
+                liveMatches: "Jogos ao Vivo",
+                completedMatches: "Concluídos",
+                discountPercentage: "Percentual de Desconto",
+                discountNote: "Desconto atual aplicado a todos os preços (3% = preços a 97% do original)",
+                basePrices: "Preços Base (Antes do Desconto)",
+                category1: "Categoria 1 (Premium)",
+                category2: "Categoria 2 (Padrão)",
+                category3: "Categoria 3 (Econômica)",
+                category4: "Categoria 4 (Orçamento)",
+                afterDiscount: "Após desconto: $",
+                savePricesBtn: "Salvar Alterações de Preço",
+                logoutBtn: "Sair",
+                refreshBtn: "Atualizar Dados",
+                viewSiteBtn: "Ver Site Público"
+            }
+        };
+
+        // Current language
+        let currentLang = localStorage.getItem('preferredLang') || 'en';
+        const langNames = { en: "English", fr: "Français", es: "Español", pt: "Português" };
+
+        // DOM Elements
+        const loginBox = document.getElementById('loginBox');
+        const dashboardBox = document.getElementById('dashboardBox');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const alertSuccess = document.getElementById('alertSuccess');
+        const alertError = document.getElementById('alertError');
+        const langBtnAdmin = document.getElementById('langBtnAdmin');
+        const langDropdownAdmin = document.getElementById('langDropdownAdmin');
+        const currentLangAdmin = document.getElementById('currentLangAdmin');
+
+        // Language selector functionality for admin
+        function setLanguageAdmin(lang) {
+            currentLang = lang;
+            localStorage.setItem('preferredLang', lang);
+            currentLangAdmin.textContent = langNames[lang];
+            
+            // Translate all admin elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[lang][key]) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.innerHTML = translations[lang][key];
+                    }
+                }
+            });
+            
+            // Translate select options
+            document.querySelectorAll('option[data-translate]').forEach(option => {
+                const key = option.getAttribute('data-translate');
+                if (translations[lang][key]) {
+                    option.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update buttons that aren't in data-translate
+            updateDynamicAdminTexts();
+            
+            // Close dropdown
+            langDropdownAdmin.classList.remove('show');
+        }
+
+        // Update dynamic admin texts
+        function updateDynamicAdminTexts() {
+            // Update delete buttons
+            document.querySelectorAll('.delete-match').forEach(btn => {
+                btn.innerHTML = `<i class="fas fa-trash"></i> ${translations[currentLang].deleteBtn}`;
+            });
+            
+            // Update save buttons in scores tab
+            document.querySelectorAll('.save-score').forEach(btn => {
+                btn.innerHTML = `<i class="fas fa-save"></i> ${translations[currentLang].saveBtn}`;
+            });
+        }
+
+        // Event listeners for admin language selector
+        langBtnAdmin.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langDropdownAdmin.classList.toggle('show');
+        });
+
+        document.querySelectorAll('.lang-option-admin').forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const lang = option.getAttribute('data-lang');
+                setLanguageAdmin(lang);
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.language-selector-admin')) {
+                langDropdownAdmin.classList.remove('show');
+            }
+        });
+
+        // Initialize admin language
+        setLanguageAdmin(currentLang);
+
+        // Check if user is already logged in
+        checkLoginStatus();
+
+        // Login functionality
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === ADMIN_USER && password === ADMIN_PASS) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                showDashboard();
+                showAlert('Login successful!', 'success');
+            } else {
+                showAlert('Invalid credentials! Use: admin / admin123', 'error');
+            }
+        });
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('adminLoggedIn');
+            showLogin();
+            showAlert('Logged out successfully!', 'success');
+        });
+
+        // Refresh button
+        refreshBtn.addEventListener('click', function() {
+            loadMatches();
+            updateTicketPrices();
+            showAlert('Data refreshed!', 'success');
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                // Show clicked tab content
+                document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+                
+                // Load specific content for tab
+                if (this.dataset.tab === 'scores') {
+                    loadScores();
+                } else if (this.dataset.tab === 'tickets') {
+                    loadTicketStats();
+                }
+            });
+        });
+
+        // Check login status
+        function checkLoginStatus() {
+            if (localStorage.getItem('adminLoggedIn') === 'true') {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        }
+
+        // Show login screen
+        function showLogin() {
+            loginBox.style.display = 'block';
+            dashboardBox.style.display = 'none';
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            loginBox.style.display = 'none';
+            dashboardBox.style.display = 'block';
+            loadMatches();
+            loadTicketStats();
+            updateStats();
+        }
+
+        // Load and display matches
+        function loadMatches() {
+            // Load matches from localStorage
+            let matches = JSON.parse(localStorage.getItem('fifaMatches')) || [
+                { id:1, name:"Mexico vs South Africa", date:"11 Jun 2026 • Opener", flag1:"mx", flag2:"za", score1:0, score2:0, status:"upcoming" },
+                { id:2, name:"USA vs Paraguay", date:"Group Stage", flag1:"us", flag2:"py", score1:0, score2:0, status:"upcoming" },
+                { id:3, name:"Brazil vs Morocco", date:"Group Stage", flag1:"br", flag2:"ma", score1:0, score2:0, status:"upcoming" }
+            ];
+            
+            const matchesList = document.getElementById('matchesList');
+            matchesList.innerHTML = '';
+            
+            if (matches.length === 0) {
+                matchesList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-futbol" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <p>No matches found. Add your first match above!</p>
+                    </div>
+                `;
+                document.getElementById('matchCount').textContent = '0';
+                return;
+            }
+            
+            document.getElementById('matchCount').textContent = matches.length;
+            
+            matches.forEach(match => {
+                const matchItem = document.createElement('div');
+                matchItem.className = 'match-item';
+                matchItem.innerHTML = `
+                    <div class="match-info">
+                        <h4>${match.name}</h4>
+                        <p><strong data-translate="matchDate">Date:</strong> ${match.date}</p>
+                        <p><strong data-translate="matchStatus">Status:</strong> <span style="color: ${
+                            match.status === 'upcoming' ? '#1565c0' : 
+                            match.status === 'live' ? '#d32f2f' : '#2e7d32'
+                        };">${translations[currentLang][match.status]}</span></p>
+                        ${match.status === 'completed' ? `<p><strong data-translate="score">Score:</strong> ${match.score1} - ${match.score2}</p>` : ''}
+                        <p><strong data-translate="flagCodes">Flag Codes:</strong> ${match.flag1} vs ${match.flag2}</p>
+                    </div>
+                    <div class="match-actions">
+                        <button class="btn btn-danger btn-sm delete-match" data-id="${match.id}">
+                            <i class="fas fa-trash"></i> ${translations[currentLang].deleteBtn}
+                        </button>
+                    </div>
+                `;
+                matchesList.appendChild(matchItem);
+            });
+            
+            // Add delete event listeners
+            document.querySelectorAll('.delete-match').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const matchId = parseInt(this.dataset.id);
+                    deleteMatch(matchId);
+                });
+            });
+            
+            updateStats();
+        }
+
+        // Load scores for editing
+        function loadScores() {
+            let matches = JSON.parse(localStorage.getItem('fifaMatches')) || [];
+            
+            const scoresList = document.getElementById('scoresList');
+            scoresList.innerHTML = '';
+            
+            if (matches.length === 0) {
+                scoresList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-futbol" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <p>No matches to update scores for.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            matches.forEach(match => {
+                const scoreItem = document.createElement('div');
+                scoreItem.className = 'match-item';
+                scoreItem.innerHTML = `
+                    <div class="match-info">
+                        <h4>${match.name}</h4>
+                        <p>${match.date}</p>
+                        <div class="score-inputs">
+                            <input type="number" class="score-input team1-score" data-id="${match.id}" value="${match.score1}" min="0">
+                            <span style="font-weight: bold; color: #ffca28;">VS</span>
+                            <input type="number" class="score-input team2-score" data-id="${match.id}" value="${match.score2}" min="0">
+                        </div>
+                        <select class="status-select" data-id="${match.id}" style="margin-top: 10px;">
+                            <option value="upcoming" ${match.status === 'upcoming' ? 'selected' : ''}>${translations[currentLang].upcoming}</option>
+                            <option value="live" ${match.status === 'live' ? 'selected' : ''}>${translations[currentLang].live}</option>
+                            <option value="completed" ${match.status === 'completed' ? 'selected' : ''}>${translations[currentLang].completed}</option>
+                        </select>
+                    </div>
+                    <div class="match-actions">
+                        <button class="btn btn-success btn-sm save-score" data-id="${match.id}">
+                            <i class="fas fa-save"></i> ${translations[currentLang].saveBtn}
+                        </button>
+                    </div>
+                `;
+                scoresList.appendChild(scoreItem);
+            });
+            
+            // Add save event listeners
+            document.querySelectorAll('.save-score').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const matchId = parseInt(this.dataset.id);
+                    updateMatchScore(matchId);
+                });
+            });
+        }
+
+        // Load ticket price statistics
+        function loadTicketStats() {
+            // Load ticket prices from localStorage
+            let ticketPrices = JSON.parse(localStorage.getItem('fifaTicketPrices')) || {
+                1: 1825,
+                2: 1290,
+                3: 745,
+                4: 370
+            };
+            
+            // Load discount from localStorage
+            let discountPercent = parseInt(localStorage.getItem('fifaDiscount')) || 3;
+            
+            // Update discount percentage input
+            document.getElementById('discountPercent').value = discountPercent;
+            
+            // Update price inputs
+            document.getElementById('priceCat1').value = ticketPrices[1];
+            document.getElementById('priceCat2').value = ticketPrices[2];
+            document.getElementById('priceCat3').value = ticketPrices[3];
+            document.getElementById('priceCat4').value = ticketPrices[4];
+            
+            // Update discounted prices display
+            updateDiscountedPrices();
+            
+            // Update discount percentage input event
+            document.getElementById('discountPercent').addEventListener('input', updateDiscountedPrices);
+            
+            // Update price inputs events
+            document.getElementById('priceCat1').addEventListener('input', updateDiscountedPrices);
+            document.getElementById('priceCat2').addEventListener('input', updateDiscountedPrices);
+            document.getElementById('priceCat3').addEventListener('input', updateDiscountedPrices);
+            document.getElementById('priceCat4').addEventListener('input', updateDiscountedPrices);
+        }
+
+        // Update discounted prices display
+        function updateDiscountedPrices() {
+            const discountPercent = parseInt(document.getElementById('discountPercent').value) || 0;
+            const discountMultiplier = (100 - discountPercent) / 100;
+            
+            const price1 = parseInt(document.getElementById('priceCat1').value) || 0;
+            const price2 = parseInt(document.getElementById('priceCat2').value) || 0;
+            const price3 = parseInt(document.getElementById('priceCat3').value) || 0;
+            const price4 = parseInt(document.getElementById('priceCat4').value) || 0;
+            
+            document.getElementById('discountedPrice1').textContent = Math.round(price1 * discountMultiplier);
+            document.getElementById('discountedPrice2').textContent = Math.round(price2 * discountMultiplier);
+            document.getElementById('discountedPrice3').textContent = Math.round(price3 * discountMultiplier);
+            document.getElementById('discountedPrice4').textContent = Math.round(price4 * discountMultiplier);
+        }
+
+        // Update ticket prices
+        function updateTicketPrices() {
+            updateDiscountedPrices();
+        }
+
+        // Add match form submission
+        document.getElementById('addMatchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const team1 = document.getElementById('team1Name').value.trim();
+            const flag1 = document.getElementById('team1Flag').value.trim().toLowerCase();
+            const team2 = document.getElementById('team2Name').value.trim();
+            const flag2 = document.getElementById('team2Flag').value.trim().toLowerCase();
+            const date = document.getElementById('matchDate').value.trim();
+            const status = document.getElementById('matchStatus').value;
+            
+            if (!team1 || !team2 || !flag1 || !flag2 || !date) {
+                showAlert('Please fill in all fields!', 'error');
+                return;
+            }
+            
+            if (flag1.length !== 2 || flag2.length !== 2) {
+                showAlert('Flag codes should be 2 letters (e.g., br, us, gb)', 'error');
+                return;
+            }
+            
+            // Load existing matches
+            let matches = JSON.parse(localStorage.getItem('fifaMatches')) || [];
+            
+            const newMatch = {
+                id: matches.length > 0 ? Math.max(...matches.map(m => m.id)) + 1 : 1,
+                name: `${team1} vs ${team2}`,
+                date: date,
+                flag1: flag1,
+                flag2: flag2,
+                score1: 0,
+                score2: 0,
+                status: status
+            };
+            
+            matches.push(newMatch);
+            localStorage.setItem('fifaMatches', JSON.stringify(matches));
+            
+            showAlert('Match added successfully!', 'success');
+            loadMatches();
+            this.reset();
+        });
+
+        // Update match score
+        function updateMatchScore(matchId) {
+            // Load matches from localStorage
+            let matches = JSON.parse(localStorage.getItem('fifaMatches')) || [];
+            
+            const matchIndex = matches.findIndex(m => m.id === matchId);
+            if (matchIndex === -1) {
+                showAlert('Match not found!', 'error');
+                return;
+            }
+            
+            const score1Input = document.querySelector(`.team1-score[data-id="${matchId}"]`);
+            const score2Input = document.querySelector(`.team2-score[data-id="${matchId}"]`);
+            const statusSelect = document.querySelector(`.status-select[data-id="${matchId}"]`);
+            
+            const score1 = parseInt(score1Input.value) || 0;
+            const score2 = parseInt(score2Input.value) || 0;
+            const status = statusSelect.value;
+            
+            matches[matchIndex].score1 = score1;
+            matches[matchIndex].score2 = score2;
+            matches[matchIndex].status = status;
+            
+            localStorage.setItem('fifaMatches', JSON.stringify(matches));
+            
+            showAlert('Match score updated successfully!', 'success');
+            updateStats();
+        }
+
+        // Delete match
+        function deleteMatch(matchId) {
+            if (!confirm('Are you sure you want to delete this match?')) return;
+            
+            // Load matches from localStorage
+            let matches = JSON.parse(localStorage.getItem('fifaMatches')) || [];
+            
+            const matchIndex = matches.findIndex(m => m.id === matchId);
+            if (matchIndex === -1) {
+                showAlert('Match not found!', 'error');
+                return;
+            }
+            
+            matches.splice(matchIndex, 1);
+            localStorage.setItem('fifaMatches', JSON.stringify(matches));
+            
+            showAlert('Match deleted successfully!', 'success');
+            loadMatches();
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            // Load matches from localStorage
+            let matches = JSON.parse(localStorage.getItem('fifaMatches')) || [];
+            
+            const totalMatches = matches.length;
+            const liveMatches = matches.filter(m => m.status === 'live').length;
+            const completedMatches = matches.filter(m => m.status === 'completed').length;
+            
+            document.getElementById('totalMatches').textContent = totalMatches;
+            document.getElementById('liveMatches').textContent = liveMatches;
+            document.getElementById('completedMatches').textContent = completedMatches;
+        }
+
+        // Prices form submission
+        document.getElementById('pricesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get values from form
+            const price1 = parseInt(document.getElementById('priceCat1').value) || 1825;
+            const price2 = parseInt(document.getElementById('priceCat2').value) || 1290;
+            const price3 = parseInt(document.getElementById('priceCat3').value) || 745;
+            const price4 = parseInt(document.getElementById('priceCat4').value) || 370;
+            const discountPercent = parseInt(document.getElementById('discountPercent').value) || 3;
+            
+            // Save to localStorage
+            const ticketPrices = {
+                1: price1,
+                2: price2,
+                3: price3,
+                4: price4
+            };
+            
+            localStorage.setItem('fifaTicketPrices', JSON.stringify(ticketPrices));
+            localStorage.setItem('fifaDiscount', discountPercent.toString());
+            
+            showAlert('Ticket prices updated successfully! Changes will appear on the public site.', 'success');
+        });
+
+        // Show alert message
+        function showAlert(message, type) {
+            if (type === 'success') {
+                alertSuccess.textContent = message;
+                alertSuccess.style.display = 'block';
+                alertError.style.display = 'none';
+                
+                setTimeout(() => {
+                    alertSuccess.style.display = 'none';
+                }, 3000);
+            } else {
+                alertError.textContent = message;
+                alertError.style.display = 'block';
+                alertSuccess.style.display = 'none';
+                
+                setTimeout(() => {
+                    alertError.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Initialize
+        updateDiscountedPrices();
+    </script>
+</body>
+</html>
